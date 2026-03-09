@@ -1,0 +1,128 @@
+services:
+  pgdatabase:
+    image: postgres:13
+    container_name: pgdatabase
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: Medillion
+    volumes:
+      - ./medillion_postgres_data:/var/lib/postgresql/data:rw
+    ports:
+      - "5432:5432"
+    networks:
+      - sparknet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d Medillion"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: root
+    ports:
+      - "8085:80"
+    depends_on:
+      pgdatabase:
+        condition: service_healthy
+    networks:
+      - sparknet
+
+  spark-master:
+    image: bde2020/spark-master:3.1.1-hadoop3.2
+    container_name: bd-spark-master
+    environment:
+      - INIT_DAEMON_STEP=setup_spark
+      - SPARK_MODE=master
+      - SPARK_MASTER_HOST=bd-spark-master
+      - SPARK_MASTER_PORT=7077
+      - SPARK_MASTER_WEBUI_PORT=8080
+    ports:
+      - "7077:7077"
+      - "8080:8080"
+    networks:
+      - sparknet
+    volumes:
+      - ./spark-events:/tmp/spark-events
+
+  spark-worker-1:
+    image: bde2020/spark-worker:3.1.1-hadoop3.2
+    container_name: bd-spark-worker-1
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER=spark://bd-spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_WEBUI_PORT=8081
+    depends_on:
+      - spark-master
+    ports:
+      - "8081:8081"
+    networks:
+      - sparknet
+    volumes:
+      - ./spark-events:/tmp/spark-events
+
+  spark-worker-2:
+    image: bde2020/spark-worker:3.1.1-hadoop3.2
+    container_name: bd-spark-worker-2
+    environment:
+      - SPARK_MODE=worker
+      - SPARK_MASTER=spark://bd-spark-master:7077
+      - SPARK_WORKER_CORES=2
+      - SPARK_WORKER_MEMORY=2G
+      - SPARK_WORKER_WEBUI_PORT=8081
+    depends_on:
+      - spark-master
+    ports:
+      - "8082:8081"
+    networks:
+      - sparknet
+    volumes:
+      - ./spark-events:/tmp/spark-events
+
+  spark-history-server:
+    image: bde2020/spark-history-server:3.1.1-hadoop3.2
+    container_name: bd-spark-history-server
+    environment:
+      - SPARK_HISTORY_OPTS=-Dspark.history.fs.logDirectory=/tmp/spark-events
+    depends_on:
+      - spark-master
+    ports:
+      - "18081:18081"
+    networks:
+      - sparknet
+    volumes:
+      - ./spark-events:/tmp/spark-events
+
+  pyspark-jupyter:
+    image: easewithdata/pyspark-jupyter-lab-old
+    container_name: bd-pyspark-jupyter-lab
+    depends_on:
+      - spark-master
+      - spark-worker-1
+      - spark-worker-2
+      - pgdatabase
+    ports:
+      - "8888:8888"
+      - "4040:4040"
+    networks:
+      - sparknet
+    volumes:
+      - ./work:/opt/workspace
+      - ./spark-events:/tmp/spark-events
+    environment:
+      - SPARK_MASTER=spark://bd-spark-master:7077
+      - POSTGRES_HOST=pgdatabase
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=Medillion
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+
+networks:
+  sparknet:
+    driver: bridge

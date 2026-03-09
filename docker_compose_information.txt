@@ -1,0 +1,65 @@
+With:
+
+docker compose up -d
+
+you will get:
+
+Postgres on localhost:5432
+
+pgAdmin on localhost:8085
+
+Spark Master on localhost:8080
+
+Spark Worker 1 on localhost:8081
+
+Spark Worker 2 on localhost:8082
+
+Spark History Server on localhost:18081
+
+Jupyter Lab on localhost:8888
+
+--------------
+
+
+How containers talk to each other
+
+Inside the Docker network:
+
+Spark master hostname: bd-spark-master
+
+Postgres hostname: pgdatabase
+
+So from PySpark, Postgres JDBC URL should be:
+
+jdbc_url = "jdbc:postgresql://pgdatabase:5432/Medillion"
+
+And Spark master URL should be:
+
+spark://bd-spark-master:7077
+In your Jupyter notebook, create Spark session like this
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder \
+    .appName("Medillion-ETL") \
+    .master("spark://bd-spark-master:7077") \
+    .config("spark.jars.packages", "org.postgresql:postgresql:42.7.3") \
+    .config("spark.eventLog.enabled", "true") \
+    .config("spark.eventLog.dir", "/tmp/spark-events") \
+    .getOrCreate()
+In pgAdmin, use these settings
+
+Host: pgdatabase
+
+Port: 5432
+
+Username: root
+
+Password: root
+
+Database: Medillion
+
+If you are connecting to Postgres from your laptop outside Docker, use:
+
+Host: localhost
+
+Port: 5432
