@@ -1,38 +1,52 @@
 # Medallion Data Engineering Pipeline (PySpark + Docker + PostgreSQL)
 
-## Overview
+## Project Overview
 
-This project implements an **end-to-end Data Engineering pipeline** using the **Medallion Architecture (Bronze → Silver → Gold)**.
-The pipeline ingests raw CSV datasets from **AWS S3**, processes them using **PySpark**, and stores the results in **PostgreSQL** across different layers of the medallion architecture.
+This project demonstrates an **end-to-end Data Engineering pipeline** built using the **Medallion Architecture (Bronze → Silver → Gold)**.
 
-The entire environment runs in **Docker**, enabling a reproducible setup that includes:
+Raw CSV datasets are ingested from **AWS S3**, processed using **PySpark**, and stored in **PostgreSQL** across structured data warehouse layers.
 
-* **PySpark**
-* **PostgreSQL**
-* **pgAdmin**
-* **JupyterLab**
+The entire system runs inside **Docker containers**, creating a reproducible environment for building scalable data pipelines and preparing **analytics-ready datasets**.
 
-The pipeline demonstrates how raw data can be ingested, cleaned, standardized, and transformed into **analytics-ready datasets**.
+The project illustrates how raw operational data can be transformed into structured datasets suitable for **analytics, machine learning, and business intelligence workflows**.
 
 ---
 
-## Architecture
+# Architecture
 
-Raw Data (CSV in AWS S3)
-⬇
-PySpark (Data Processing)
-⬇
+```
+AWS S3 (Raw CSV Data)
+        │
+        ▼
+PySpark Processing Engine
+        │
+        ▼
 PostgreSQL Data Warehouse
-
-Medallion Layers:
-
-Bronze Layer → Raw ingestion
-Silver Layer → Cleaned and standardized data
-Gold Layer → Business-ready views for analytics
+ ├── Bronze Layer (Raw Data)
+ ├── Silver Layer (Cleaned Data)
+ └── Gold Layer (Business Ready Data)
+        │
+        ▼
+Analytics / BI / ML Models
+```
 
 ---
 
-## Tech Stack
+# Medallion Architecture
+
+The project follows the **Medallion Data Architecture**, a modern data engineering design pattern used to progressively refine datasets.
+
+| Layer  | Purpose                               |
+| ------ | ------------------------------------- |
+| Bronze | Raw ingestion of source datasets      |
+| Silver | Cleaned, validated, standardized data |
+| Gold   | Business-ready analytical datasets    |
+
+This layered architecture improves **data reliability, maintainability, and scalability**.
+
+---
+
+# Tech Stack
 
 | Component               | Technology |
 | ----------------------- | ---------- |
@@ -41,100 +55,110 @@ Gold Layer → Business-ready views for analytics
 | Containerization        | Docker     |
 | Data Source             | AWS S3     |
 | Development Environment | JupyterLab |
-| Database UI             | pgAdmin    |
+| Database Interface      | pgAdmin    |
 
 ---
 
-## Project Workflow
+# Key Data Engineering Skills Demonstrated
 
-### 1. Docker Environment Setup
-
-The entire system is containerized using **Docker**.
-
-The Docker setup launches:
-
-* **PySpark container**
-* **PostgreSQL database**
-* **pgAdmin UI**
-
-This ensures that all dependencies are isolated and the environment can be easily reproduced.
+* End-to-end **ETL / ELT pipeline design**
+* **Medallion data architecture implementation**
+* Distributed data processing using PySpark
+* Data ingestion from AWS S3
+* Data cleaning and transformation pipelines
+* Data warehouse schema design
+* Containerized data engineering environments using Docker
+* Analytics-ready dataset preparation
 
 ---
 
-### 2. Data Ingestion (Bronze Layer)
+# Project Workflow
 
-Inside the **PySpark container**, JupyterLab is used to run PySpark notebooks.
+## 1. Docker Environment Setup
+
+The entire data platform runs inside **Docker containers**.
+
+The environment launches:
+
+* PySpark container
+* PostgreSQL database
+* pgAdmin interface
+* JupyterLab environment
+
+This allows the project to run in a **fully reproducible environment**.
+
+Start the system with:
+
+```
+docker-compose up -d
+```
+
+---
+
+# 2. Data Ingestion – Bronze Layer
+
+Raw CSV datasets stored in **AWS S3** are ingested using PySpark.
 
 Steps:
 
-1. Configure **AWS credentials** inside the PySpark environment.
-2. Access raw **CSV datasets stored in AWS S3**.
-3. Use **PySpark** to read the datasets.
-4. Load the raw datasets into the **Bronze schema in PostgreSQL**.
+1. Configure AWS credentials inside PySpark
+2. Connect to S3 storage
+3. Load raw CSV datasets
+4. Store datasets in the **Bronze schema** of PostgreSQL
 
-The Bronze layer represents **raw ingested data with minimal transformation**.
-
----
-
-### 3. Data Cleaning & Standardization (Silver Layer)
-
-Once the raw data is available in the Bronze layer:
-
-1. Business data structures are analyzed.
-2. Data quality issues are addressed:
-
-   * duplicate records
-   * inconsistent formats
-   * missing values
-3. Data is **cleaned and standardized** using PySpark transformations.
-
-The processed data is then loaded into the **Silver schema**.
-
-The Silver layer contains **validated and structured data suitable for downstream analysis**.
+The Bronze layer preserves the **raw source data** for traceability and auditing.
 
 ---
 
-### 4. Data Modeling & Business Layer (Gold Layer)
+# 3. Data Cleaning & Transformation – Silver Layer
 
-In the Gold layer:
+The Silver layer performs **data preparation and standardization**.
 
-1. Relationships between tables are analyzed.
-2. Relevant **joins** between entities are created.
-3. **Surrogate keys** are introduced where required.
-4. **Business views** are created for analytics and reporting.
+Data quality processes include:
 
-The Gold layer provides **analytics-ready datasets optimized for BI and reporting tools**.
+* Removing duplicate records
+* Handling missing values
+* Fixing inconsistent formats
+* Standardizing field structures
 
----
+Cleaned datasets are then stored in the **Silver schema**.
 
-## Medallion Architecture
-
-Bronze → Raw ingestion
-Silver → Cleaned and standardized data
-Gold → Business-ready views
-
-| Layer  | Purpose                                       |
-| ------ | --------------------------------------------- |
-| Bronze | Raw data ingestion from AWS S3                |
-| Silver | Data cleaning, validation, and transformation |
-| Gold   | Aggregated and business-ready datasets        |
+This layer ensures **validated and structured data** suitable for analysis.
 
 ---
 
-## Project Structure
+# 4. Business Data Modeling – Gold Layer
+
+The Gold layer creates **analytics-ready datasets**.
+
+Transformations include:
+
+* Table joins between entities
+* Creation of surrogate keys
+* Aggregated business views
+* Analytical data structures
+
+These datasets support **BI dashboards and machine learning workflows**.
+
+---
+
+# Project Structure
 
 ```
 project-root
 │
 ├── docker-compose.yml
-├── docker_compose_information  
+├── docker_compose_information
 │
 ├── data_Loading
 │   └── pyspark_all_at_once_bronze_load.py
 │
 ├── datasets
-│   └── crm └── erp
+│   ├── crm
+|   |     └── csv files
+│   └── erp
 │        └── csv files
+│
 ├── medallion_Stages
 │   ├── bronze
 │   ├── silver
@@ -145,9 +169,9 @@ project-root
 
 ---
 
-## How to Run the Project
+# Running the Project
 
-### 1. Start the Docker Environment
+## Step 1: Start Docker Containers
 
 ```
 docker-compose up -d
@@ -161,33 +185,29 @@ This launches:
 
 ---
 
-### 2. Open JupyterLab
+# Step 2: Open JupyterLab
 
-Access JupyterLab from the PySpark container.
+Use the PySpark container to run notebooks that:
 
-Run the PySpark notebooks to:
+* Connect to AWS S3
+* Load raw datasets
+* Run PySpark transformations
 
-* connect to AWS S3 : watch https://www.youtube.com/watch?v=rBUbBPctj9s&list=PL2IsFZBGM_IExqZ5nHg0wbTeiWVd8F06b&index=5
-* ingest raw datasets
-* run transformations
+Reference tutorial used:
+
+https://www.youtube.com/watch?v=rBUbBPctj9s
 
 ---
 
-### 3. Verify Data in PostgreSQL Using pgAdmin
+# Step 3: Verify Data in pgAdmin
 
-The project includes **pgAdmin** to visually inspect the database tables and schemas.
-
-#### Access pgAdmin
-
-After running the Docker containers, open your browser and go to:
+Open pgAdmin in your browser:
 
 ```
 http://localhost:8085
 ```
 
-Login using the credentials defined in the `docker-compose.yml` file.
-
-Example:
+Example credentials:
 
 ```
 Email: admin@admin.com
@@ -196,80 +216,137 @@ Password: admin
 
 ---
 
-#### Create a Database Connection
+# Configure Database Connection
 
-Once logged into pgAdmin:
-
-1. Click **Add New Server**
-2. Go to the **General** tab
-3. Enter a name for the connection (example: `Medallion_DB`)
-
----
-
-#### Configure the Connection
-
-Go to the **Connection** tab and enter:
+### General Tab
 
 ```
-Host name/address: pgdatabase
+Name: Medallion_DB
+```
+
+### Connection Tab
+
+```
+Host: pgdatabase
 Port: 5432
-Database: Medillion
+Database: Medallion
 Username: root
 Password: root
 ```
-
-These values correspond to the **PostgreSQL container configuration in Docker**.
 
 Click **Save**.
 
 ---
 
-#### Explore the Schemas
-
-After connecting, expand the database to view the schemas:
+# Explore the Medallion Schemas
 
 ```
 Databases
-   └── Medillion
+   └── Medallion
         └── Schemas
              ├── bronze
              ├── silver
              └── gold
 ```
 
-These schemas represent the **Medallion Architecture layers** used in this project.
-
 You can inspect:
 
-* tables loaded in the **Bronze layer**
-* cleaned and standardized tables in the **Silver layer**
-* business-ready views in the **Gold layer**
+* Raw ingestion tables
+* Cleaned datasets
+* Business-ready analytics views
 
 ---
 
-## Key Concepts Demonstrated
+# Example Analytics Query
 
-* Medallion Architecture
-* Data ingestion from AWS S3
-* Distributed data processing with PySpark
-* Data cleaning and transformation
-* Data modeling
-* Surrogate keys
-* Containerized data engineering environments
+Example query using the Gold layer:
 
----
+```
+SELECT customer_id,
+       COUNT(order_id) AS total_orders,
+       SUM(order_value) AS total_revenue
+FROM gold.customer_sales_summary
+GROUP BY customer_id
+ORDER BY total_revenue DESC;
+```
 
-## Future Improvements
-
-Potential enhancements include:
-
-* Adding **Apache Airflow** for pipeline orchestration
-* Implementing **incremental data loads**
-* Adding **data quality validation checks**
-* Integrating **BI tools for visualization**
+This demonstrates how the pipeline supports **business insights and analytics**.
 
 ---
 
-## Author
+# Data Quality Validation
 
-Data Engineering Project demonstrating an end-to-end pipeline using AWS, PySpark, Docker, and PostgreSQL.
+To ensure reliable analytics datasets, validation checks can be added during the Silver stage.
+
+Examples include:
+
+* Null value validation
+* Schema validation
+* Duplicate detection
+* Constraint enforcement
+
+These checks improve **data reliability for analytics and machine learning pipelines**.
+
+---
+
+# Pipeline Monitoring & Logging
+
+Future improvements include adding **pipeline observability** features such as:
+
+* Execution logging
+* Transformation metrics
+* Failure alerts
+* Data lineage tracking
+
+These features are important for **production-grade data engineering pipelines**.
+
+---
+
+# MLOps & AI Integration Potential
+
+The Gold layer datasets can serve as inputs for **machine learning pipelines** such as:
+
+* Predictive models
+* Customer segmentation
+* Anomaly detection
+* Recommendation systems
+
+The architecture is designed to support **scalable ML workflows and data science experimentation**.
+
+---
+
+# Future Improvements
+
+Possible enhancements include:
+
+* Pipeline orchestration using Apache Airflow
+* Incremental data ingestion strategies
+* Automated data quality validation
+* Monitoring and logging pipelines
+* Integration with BI tools (Power BI / Tableau)
+* CI/CD pipeline for automated deployments
+
+---
+
+# Why This Project Matters
+
+Modern organizations require scalable pipelines that transform raw operational data into structured analytical datasets.
+
+This project demonstrates how **cloud storage, distributed processing, and containerized infrastructure** can be combined to build reliable and scalable **data engineering pipelines**.
+
+---
+
+# Author
+
+**Shubhrajit Pal**
+
+Data Engineering project demonstrating an end-to-end pipeline using:
+
+* AWS S3
+* PySpark
+* Docker
+* PostgreSQL
+* Medallion Data Architecture
+
+GitHub
+https://github.com/spal1995
