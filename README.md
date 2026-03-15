@@ -10,7 +10,7 @@ The entire system runs inside **Docker containers**, creating a reproducible env
 
 The project illustrates how raw operational data can be transformed into structured datasets suitable for **analytics, machine learning, and business intelligence workflows**.
 
-[!Data_layers](data_layers.pdf)
+[View Architecture Diagram (PDF)](data_layers.pdf)
 
 ---
 
