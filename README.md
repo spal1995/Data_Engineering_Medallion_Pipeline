@@ -1,4 +1,4 @@
-# Medallion Data Engineering Pipeline (PySpark + Docker + PostgreSQL)
+# End-to-end Medallion (Bronze → Silver → Gold) data pipeline built with PySpark, PostgreSQL and Docker implementing batch ETL workflows.
 
 ## Project Overview
 
